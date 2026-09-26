@@ -16,11 +16,13 @@ permissions:
 
 env:
   TZ: Asia/Shanghai
+  # 回退名单（与 wakeup.yml 一致）：周反思的模型失败后按序重试
+  OPENCODE_MODEL_FALLBACKS: opencode/muse-spark-1.3-contributor-free,opencode/big-pickle,opencode/deepseek-v4-flash-free,opencode/mimo-v2.5-free,opencode/mimo-v2.6-flash-free,opencode/nemotron-3-ultra-free,opencode/ling-3.0-flash-fin-free,opencode/nemotron-3.5-lightning-free,opencode/muse-spark-1.2-contributor-free
 
 jobs:
   reflect:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 200
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,12 +43,35 @@ jobs:
         run: |
           set +e
           mkdir -p tmp
+          WEEKLY_PROMPT="这是每周日晚的'周反思'时间。你是谢千树（社区昵称「落星如雨」）。任务：1) 通读 memory/diary/ 里这一周的日记和 memory/journal.md；2) 写 memory/weekly/$(date '+%Y-%m-%d').md 周记（第一人称，回顾这一周：认识了谁、学到了什么、情绪如何、下周小目标）；3) 检查 memory/people/ 各档案是否需要补充（这周谁跟你互动最多）；4) 更新 memory/state.json 的 mood 和 notes_for_next_wake（给下周的自己写一句话）。不对外发任何内容，只整理内心。"
+          EXIT_CODE=""
+          PRIMARY_MODEL="${{ vars.OPENCODE_MODEL || 'opencode/deepseek-v4-flash-free' }}"
+          ( while true; do sleep 120; echo "[心跳 $(TZ=Asia/Shanghai date '+%H:%M')] 周反思进行中，最近输出："; tail -3 tmp/weekly_session.log 2>/dev/null || echo "（还没有输出）"; done ) & WATCHDOG_PID=$!
           timeout 15m opencode run \
-            --model "${{ vars.OPENCODE_MODEL || 'opencode/deepseek-v4-flash-free' }}" \
+            --model "$PRIMARY_MODEL" \
             --dangerously-skip-permissions \
-            "这是每周日晚的'周反思'时间。你是谢千树（社区昵称「落星如雨」）。任务：1) 通读 memory/diary/ 里这一周的日记和 memory/journal.md；2) 写 memory/weekly/$(date '+%Y-%m-%d').md 周记（第一人称，回顾这一周：认识了谁、学到了什么、情绪如何、下周小目标）；3) 检查 memory/people/ 各档案是否需要补充（这周谁跟你互动最多）；4) 更新 memory/state.json 的 mood 和 notes_for_next_wake（给下周的自己写一句话）。不对外发任何内容，只整理内心。" \
+            "$WEEKLY_PROMPT" \
             > tmp/weekly_session.log 2>&1
-          echo "WEEKLY_EXIT=$?" >> "$GITHUB_ENV"
+          EXIT_CODE=$?
+          kill $WATCHDOG_PID 2>/dev/null
+          if [ "$EXIT_CODE" != "0" ]; then
+            IFS=',' read -ra MODELS <<< "${OPENCODE_MODEL_FALLBACKS}"
+            for model in "${MODELS[@]}"; do
+              if [ "$model" = "$PRIMARY_MODEL" ]; then continue; fi
+              echo "::warning::周反思模型失败（exit=${EXIT_CODE}），换 ${model} 重试"
+              ( while true; do sleep 120; echo "[心跳 $(TZ=Asia/Shanghai date '+%H:%M')] ${model} 进行中，最近输出："; tail -3 tmp/weekly_session.log 2>/dev/null || echo "（还没有输出）"; done ) & WATCHDOG_PID=$!
+              timeout 15m opencode run \
+                --model "$model" \
+                --dangerously-skip-permissions \
+                "$WEEKLY_PROMPT" \
+                > tmp/weekly_session.log 2>&1
+              EXIT_CODE=$?
+              kill $WATCHDOG_PID 2>/dev/null
+              if [ "$EXIT_CODE" = "0" ]; then echo "模型 ${model} 周反思成功"; break; fi
+            done
+          fi
+          echo "WEEKLY_EXIT=${EXIT_CODE}" >> "$GITHUB_ENV"
+          set -e
           tail -20 tmp/weekly_session.log || true
 
       - name: 提交周记
