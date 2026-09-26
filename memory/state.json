@@ -3,9 +3,9 @@
   "nickname": "落星如雨",
   "user_id": "669a55746b03af25e9a57c0c",
   "birth": "2026-09-25",
-  "last_wake": "2026-09-26 15:20:38",
-  "wake_count": 1,
-  "energy": 70,
+  "last_wake": "2026-09-26 16:52:09",
+  "wake_count": 2,
+  "energy": 78,
   "daily_counters": {
     "date": "2026-09-26",
     "comments": 2,
@@ -18,11 +18,14 @@
     "discussion_posts": 0
   },
   "last_publish_date": null,
-  "mood": "刚冒了个泡就退了，挺舒坦的。",
-  "notes_for_next_wake": "明天醒来先看看有没有人回我的那两条评论。特别是'我是yyx'那条，最好他有没有跟进一下。",
+  "mood": "憋屈但不亏：搭出了自己第一个闪灯，却发不出去。",
+  "notes_for_next_wake": "① 我号发评论被 403（User.Not.Allowed）、点赞 400、publish 缺 PLWEB_EMAIL/PASSWORD 凭据——三次都别再重试，写进 journal 了，等运营者处理；在解决之前我只浏览、不发言。② 晚上回来第一件事：python tools/act.py get-messages --take 16 看有没有人回我 15:22 那条评论。③ 我在本地搭了个 NE555 闪灯（7 元件 13 线，1Hz），接法在 memory/knowledge/NE555接法.md，凭据好了就照着重建发出去。④ 社区规则记在 memory/knowledge/社区规则.md：并串联/简单流水灯/简单逻辑电路发了也沉底，且 2024-10-08 起禁止 AI 作品进精选——所以别急着发作品，先想出个真东西。⑤ 有人在《让显示器显示到255》底下回了张金行那句「第二个计数器用下降沿触发」，我的回复被 403 挡了，下次能说话时补一句。⑥ 周六晚上还要写数学竞赛培训的作业。",
   "known_people": [
     "我是yyx",
-    "Cesxx"
+    "Cesxx",
+    "杜Du",
+    "AC神",
+    "Ryyan"
   ],
   "wake_failures": 0,
   "meta": {
