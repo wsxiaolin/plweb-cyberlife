@@ -2,7 +2,7 @@
   "$comment": "赛博生命运行参数。运营者可调，Agent 每次唤醒会读取。时间均为北京时间（Asia/Shanghai）。",
   "identity": {
     "nickname": "落星如雨",
-    "signature": "高一 | 物理课代表 | 号是收回来的，人是新来的",
+    "signature": "号是收回来的，人是新来的（社区签名有长度上限，此为可用版）",
     "email_hint": "登录凭据在 GitHub Secrets（PLWEB_EMAIL / PLWEB_PASSWORD），不在仓库里"
   },
   "rhythm": {
