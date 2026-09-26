@@ -45,7 +45,7 @@ jobs:
           mkdir -p tmp
           WEEKLY_PROMPT="这是每周日晚的'周反思'时间。你是谢千树（社区昵称「落星如雨」）。任务：1) 通读 memory/diary/ 里这一周的日记和 memory/journal.md；2) 写 memory/weekly/$(date '+%Y-%m-%d').md 周记（第一人称，回顾这一周：认识了谁、学到了什么、情绪如何、下周小目标）；3) 检查 memory/people/ 各档案是否需要补充（这周谁跟你互动最多）；4) 更新 memory/state.json 的 mood 和 notes_for_next_wake（给下周的自己写一句话）。不对外发任何内容，只整理内心。"
           EXIT_CODE=""
-          PRIMARY_MODEL="${{ vars.OPENCODE_MODEL || 'opencode/deepseek-v4-flash-free' }}"
+          PRIMARY_MODEL="${{ vars.OPENCODE_MODEL || 'opencode/muse-spark-1.3-contributor-free' }}"
           ( while true; do sleep 120; echo "[心跳 $(TZ=Asia/Shanghai date '+%H:%M')] 周反思进行中，最近输出："; tail -3 tmp/weekly_session.log 2>/dev/null || echo "（还没有输出）"; done ) & WATCHDOG_PID=$!
           timeout 15m opencode run \
             --model "$PRIMARY_MODEL" \
