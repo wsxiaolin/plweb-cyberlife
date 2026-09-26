@@ -1,0 +1,173 @@
+name: 唤醒 · Wake
+
+# 赛博生命的"生物钟"。时间均为北京时间（cron 用 UTC，北京=UTC+8）：
+#   工作日 06:55 早自习前        -> 55 22 * * 0-4 (UTC)
+#   工作日 12:40 午休            -> 40 4  * * 1-5
+#   工作日 22:05 晚自习回家后    -> 5  14 * * 1-5
+#   周末   10:00 / 20:30         -> 0 2 * * 6,7 / 30 12 * * 6,7
+# GitHub cron 本身有几分钟到几十分钟的随机延迟，天然形成"人味抖动"。
+
+on:
+  schedule:
+    - cron: "55 22 * * 0-4"
+    - cron: "40 4 * * 1-5"
+    - cron: "5 14 * * 1-5"
+    - cron: "0 2 * * 6,7"
+    - cron: "30 12 * * 6,7"
+  workflow_dispatch:
+    inputs:
+      trigger_note:
+        description: "手动唤醒原因（会写进提示词，如 '运营者手动唤醒'）"
+        default: "运营者手动唤醒"
+      model_override:
+        description: "覆盖本次模型（如 opencode/big-pickle），留空用默认"
+        default: ""
+
+concurrency:
+  group: wakeup
+  cancel-in-progress: false   # 排队不取消：一次只醒一个
+
+permissions:
+  contents: write   # 提交记忆回仓库
+  issues: write     # 唤醒异常时自动开 issue 告警
+
+env:
+  TZ: Asia/Shanghai
+  # 模型可被 repo variable OPENCODE_MODEL / 手动输入覆盖；默认免费模型（plweb2 同款）
+  OPENCODE_MODEL_DEFAULT: opencode/deepseek-v4-flash-free
+  OPENCODE_MODEL_FALLBACK: opencode/big-pickle
+
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: 检出仓库（含全部记忆）
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: 安装 Python 3.14 与依赖
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install -r tools/requirements.txt
+
+      - name: 安装 Open Code CLI
+        run: npm install -g opencode-ai
+
+      - name: 睁眼 · 拉取社区动态（prepare）
+        env:
+          PLWEB_EMAIL: ${{ secrets.PLWEB_EMAIL }}
+          PLWEB_PASSWORD: ${{ secrets.PLWEB_PASSWORD }}
+        run: |
+          set +e
+          python tools/prepare.py --browse-pages 2
+          echo "PREPARE_EXIT=$?" >> "$GITHUB_ENV"
+          set -e
+          # 登录失败(2)：跳过 Agent，直接走 finalize 写"断网日"日记（回退策略 L1）
+          if [ "${PREPARE_EXIT}" = "2" ]; then
+            echo "::warning::社区登录失败，本次唤醒降级为离线日记模式"
+          fi
+
+      - name: 模型选择
+        run: |
+          if [ -n "${{ github.event.inputs.model_override }}" ]; then
+            echo "MODEL=${{ github.event.inputs.model_override }}" >> "$GITHUB_ENV"
+          elif [ -n "${{ vars.OPENCODE_MODEL }}" ]; then
+            echo "MODEL=${{ vars.OPENCODE_MODEL }}" >> "$GITHUB_ENV"
+          else
+            echo "MODEL=${OPENCODE_MODEL_DEFAULT}" >> "$GITHUB_ENV"
+          fi
+
+      - name: 生活 · Open Code 主模型唤醒
+        if: env.PREPARE_EXIT == '0'
+        env:
+          # 运营者若有自有模型密钥，填入 repo secrets 即可透传给 opencode
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set +e
+          TRIGGER="${{ github.event_name }}"
+          [ "$TRIGGER" = "workflow_dispatch" ] && TRIGGER="手动唤醒（${{ github.event.inputs.trigger_note }}）"
+          python3 - "$TRIGGER" <<'PY' > tmp/wake_prompt.txt
+          import sys, datetime
+          now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
+          tpl = open("prompts/wakeup.md", encoding="utf-8").read()
+          tpl = tpl.replace("{DATE}", now.strftime("%Y-%m-%d"))
+          tpl = tpl.replace("{TIME}", now.strftime("%H:%M"))
+          tpl = tpl.replace("{TRIGGER}", sys.argv[1])
+          sys.stdout.write(tpl)
+          PY
+          timeout 20m opencode run \
+            --model "${{ env.MODEL }}" \
+            --dangerously-skip-permissions \
+            "$(cat tmp/wake_prompt.txt)" \
+            > tmp/agent_session.log 2>&1
+          echo "AGENT_EXIT=$?" >> "$GITHUB_ENV"
+          set -e
+          echo "主模型退出码：${AGENT_EXIT}"
+          tail -30 tmp/agent_session.log || true
+
+      - name: 生活 · 自动回退（备用模型 + 简化任务）
+        if: env.PREPARE_EXIT == '0' && env.AGENT_EXIT != '0'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::warning::主模型唤醒失败（exit=${AGENT_EXIT}），启用回退模型 ${OPENCODE_MODEL_FALLBACK}（简化任务：只处理收件箱+写记忆）"
+          set +e
+          timeout 15m opencode run \
+            --model "${OPENCODE_MODEL_FALLBACK}" \
+            --dangerously-skip-permissions \
+            "回退唤醒：主模型失败了，你的任务从简——读 tmp/inbox.json，只做两件事：1) 给最重要的1-2条消息写回复并发送（python tools/act.py comment ...）；2) 写今天的日记 memory/diary/$(TZ=Asia/Shanghai date '+%Y-%m-%d').md 并更新 memory/state.json。规则仍按 AGENTS.md。" \
+            > tmp/agent_fallback.log 2>&1
+          echo "AGENT_EXIT=$?" >> "$GITHUB_ENV"
+          set -e
+          tail -20 tmp/agent_fallback.log || true
+
+      - name: 收尾 · 校验与自动修复（finalize）
+        run: |
+          set +e
+          python tools/finalize.py --agent-exit "${AGENT_EXIT:-2}"
+          echo "FINALIZE_EXIT=$?" >> "$GITHUB_ENV"
+          set -e
+          cat tmp/wake_report.json || true
+
+      - name: 提交记忆回仓库
+        run: |
+          git config user.name "谢古诗"
+          git config user.email "xiegushi2022@outlook.com"
+          git add memory/ persona/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "本次唤醒没有记忆变化（沉默的一天也是一天）"
+          else
+            git commit -m "记忆 · $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') 醒过一次"
+            git push
+          fi
+
+      - name: 异常告警（连续失败开 issue）
+        if: env.FINALIZE_EXIT == '3'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "🤒 唤醒异常 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" \
+            --body "finalize 判定为严重失败（fatal）。查看 run 日志与 wake_report.json。若连续多次失败，请检查：1) 社区账号凭据 2) 模型可用性 3) prepare 的 errors 字段。" \
+            --label "wake-failure" || echo "issue 创建失败（可能 label 不存在，忽略）"
+
+      - name: 归档审计材料
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wake-${{ github.run_id }}
+          retention-days: 7
+          path: |
+            tmp/inbox.json
+            tmp/actions.log
+            tmp/wake_report.json
+            tmp/agent_session.log
+            tmp/agent_fallback.log
