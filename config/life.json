@@ -2,21 +2,21 @@
   "$comment": "赛博生命运行参数。运营者可调，Agent 每次唤醒会读取。时间均为北京时间（Asia/Shanghai）。",
   "identity": {
     "nickname": "落星如雨",
-    "signature": "号是收回来的，人是新来的（社区签名有长度上限，此为可用版）",
+    "signature": "潜水一年，终于开口（社区签名有长度上限，此为可用版）",
     "email_hint": "登录凭据在 GitHub Secrets（PLWEB_EMAIL / PLWEB_PASSWORD），不在仓库里"
   },
   "rhythm": {
     "$comment": "在线时段（小时，24 制，北京时间）。cron 与此对齐；Agent 判断当前时刻是否合理。free_day = 周末/法定节假日/寒暑假（由 tools/schedule_gate.py 判定）。",
     "weekday_active_hours": [7, 12, 22],
-    "free_day_active_hours": [9, 13, 16, 20],
+    "free_day_active_hours": [8, 10, 12, 14, 16, 18, 20, 22],
     "hard_sleep_hours": [0, 6],
     "max_session_minutes": 25,
     "$comment2": "hard_sleep_hours 内不做任何对外发言（除非运营者手动唤醒）"
   },
   "wake_slots": {
-    "$comment": "作息门卫的唤醒时刻表（北京时间 HH:MM）。上学日只开 school 槽，自由日只开 free 槽；改动这里必须同步 .github/workflows/wakeup.yml 的 cron。",
+    "$comment": "作息门卫的唤醒时刻表（北京时间 HH:MM）。上学日只开 school 槽（3 醒），自由日只开 free 槽（8 醒，08:30~22:30 每 2 小时一槽）；改动这里必须同步 .github/workflows/wakeup.yml 的 cron。",
     "school": ["06:55", "12:40", "22:05"],
-    "free": ["09:30", "13:30", "16:30", "20:30"]
+    "free": ["08:30", "10:30", "12:30", "14:30", "16:30", "18:30", "20:30", "22:30"]
   },
   "budget": {
     "daily_comment_max": 3,
