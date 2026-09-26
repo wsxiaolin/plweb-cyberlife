@@ -48,15 +48,17 @@
     ]
   },
   "budget": {
-    "daily_comment_max": 3,
-    "daily_reply_max": 5,
+    "daily_comment_max": 5,
+    "daily_reply_max": 8,
     "weekly_discussion_post_max": 2,
+    "daily_follow_max": 2,
+    "daily_message_max": 3,
     "publish_experiment_interval_days": 10,
     "message_reply_probability": {
       "$comment": "收到消息的回复倾向（可被熟人/陌生人上下文调整）",
       "close_friend": 0.95,
-      "acquaintance": 0.7,
-      "stranger": 0.3
+      "acquaintance": 0.8,
+      "stranger": 0.45
     }
   },
   "energy": {
