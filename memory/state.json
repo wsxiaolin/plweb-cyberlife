@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "nickname": "谢古诗",
+  "user_id": "6666ff550b5f97d6e49d12d7",
+  "birth": "2026-09-25",
+  "last_wake": null,
+  "wake_count": 0,
+  "energy": 100,
+  "daily_counters": {
+    "date": null,
+    "comments": 0,
+    "replies": 0,
+    "posts": 0,
+    "messages": 0
+  },
+  "weekly_counters": {
+    "week_of": null,
+    "discussion_posts": 0
+  },
+  "last_publish_date": null,
+  "mood": "刚醒来的新奇。一切都想要看看。",
+  "notes_for_next_wake": "这是出生状态。第一次唤醒要做'出生仪式'：确认身份、改名（如仍是旧昵称）、给社区打招呼或安静地先潜水观察。",
+  "known_people": [],
+  "wake_failures": 0,
+  "meta": {
+    "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
+  }
+}
