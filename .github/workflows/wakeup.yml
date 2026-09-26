@@ -48,12 +48,15 @@ env:
   TZ: Asia/Shanghai
   # 模型可被 repo variable OPENCODE_MODEL / 手动输入覆盖；默认免费模型（plweb2 同款）
   OPENCODE_MODEL_DEFAULT: opencode/deepseek-v4-flash-free
-  OPENCODE_MODEL_FALLBACK: opencode/big-pickle
+  # 回退名单：主模型失败后按此顺序逐个换模型（同样的完整人生，任务不简化），
+  # 逗号分隔；名单与主模型重复的项会自动跳过
+  OPENCODE_MODEL_FALLBACKS: opencode/muse-spark-1.3-contributor-free,opencode/big-pickle,opencode/deepseek-v4-flash-free,opencode/mimo-v2.5-free,opencode/mimo-v2.6-flash-free,opencode/nemotron-3-ultra-free,opencode/ling-3.0-flash-fin-free,opencode/nemotron-3.5-lightning-free,opencode/muse-spark-1.2-contributor-free
 
 jobs:
   wake:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # 最坏预算：主模型 40m + 回退名单 8 级 × 25m = 240m，再留出 checkout/prepare/finalize/提交
+    timeout-minutes: 300
     steps:
       - name: 检出仓库（含全部记忆）
         uses: actions/checkout@v4
@@ -138,31 +141,54 @@ jobs:
           tpl = tpl.replace("{TRIGGER}", sys.argv[1])
           sys.stdout.write(tpl)
           PY
+          # 心跳看护：agent 输出全部重定向到文件，CI 页面会长时间无输出像卡死；
+          # 每 2 分钟把日志尾部打进 CI 日志证明"还活着"
+          ( while true; do sleep 120; echo "[心跳 $(TZ=Asia/Shanghai date '+%H:%M')] 主模型进行中，最近输出："; tail -3 tmp/agent_session.log 2>/dev/null || echo "（还没有输出）"; done ) & WATCHDOG_PID=$!
           timeout 40m opencode run \
             --model "${{ env.MODEL }}" \
             --dangerously-skip-permissions \
             "$(cat tmp/wake_prompt.txt)" \
             > tmp/agent_session.log 2>&1
           echo "AGENT_EXIT=$?" >> "$GITHUB_ENV"
+          kill $WATCHDOG_PID 2>/dev/null
           set -e
           echo "主模型退出码：${AGENT_EXIT}"
           tail -30 tmp/agent_session.log || true
 
-      - name: 生活 · 自动回退（备用模型，同样的完整人生）
+      - name: 生活 · 自动回退（按名单换模型，同样的完整人生）
         if: env.PREPARE_EXIT == '0' && env.AGENT_EXIT != '0'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "::warning::主模型唤醒失败（exit=${AGENT_EXIT}），换备用模型 ${OPENCODE_MODEL_FALLBACK} 继续同一段人生（任务不简化）"
           set +e
-          timeout 25m opencode run \
-            --model "${OPENCODE_MODEL_FALLBACK}" \
-            --dangerously-skip-permissions \
-            "$(cat tmp/wake_prompt.txt)" \
-            > tmp/agent_fallback.log 2>&1
-          echo "AGENT_EXIT=$?" >> "$GITHUB_ENV"
+          EXIT_CODE="${AGENT_EXIT}"
+          IFS=',' read -ra MODELS <<< "${OPENCODE_MODEL_FALLBACKS}"
+          for model in "${MODELS[@]}"; do
+            if [ "$model" = "${{ env.MODEL }}" ]; then
+              echo "跳过 ${model}（主模型刚失败过）"
+              continue
+            fi
+            echo "::warning::主模型失败（exit=${EXIT_CODE}），换名单模型 ${model} 继续同一段人生（任务不简化）"
+            ( while true; do sleep 120; echo "[心跳 $(TZ=Asia/Shanghai date '+%H:%M')] ${model} 进行中，最近输出："; tail -3 tmp/agent_fallback.log 2>/dev/null || echo "（还没有输出）"; done ) & WATCHDOG_PID=$!
+            timeout 25m opencode run \
+              --model "$model" \
+              --dangerously-skip-permissions \
+              "$(cat tmp/wake_prompt.txt)" \
+              > tmp/agent_fallback.log 2>&1
+            EXIT_CODE=$?
+            echo "AGENT_EXIT=${EXIT_CODE}" >> "$GITHUB_ENV"
+            kill $WATCHDOG_PID 2>/dev/null
+            tail -20 tmp/agent_fallback.log || true
+            if [ "$EXIT_CODE" = "0" ]; then
+              echo "模型 ${model} 唤醒成功，停止回退"
+              break
+            fi
+            echo "::warning::模型 ${model} 失败（exit=${EXIT_CODE}），试名单下一个"
+          done
           set -e
-          tail -20 tmp/agent_fallback.log || true
+          if [ "$EXIT_CODE" != "0" ]; then
+            echo "::error::回退名单全部失败（exit=${EXIT_CODE}），交由 finalize 按失败处理"
+          fi
 
       - name: 收尾 · 校验与自动修复（finalize）
         run: |
