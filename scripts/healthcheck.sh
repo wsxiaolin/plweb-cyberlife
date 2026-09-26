@@ -31,7 +31,7 @@ echo "=== 3/4 记忆文件完整性 ==="
 python3 - <<'PY'
 import json, pathlib
 state = json.loads(pathlib.Path("memory/state.json").read_text(encoding="utf-8"))
-assert state["nickname"] == "谢古诗"
+assert state["nickname"] == "落星如雨"
 for f in ("persona/identity.md", "persona/life_story.md", "AGENTS.md"):
     assert pathlib.Path(f).exists(), f
 print("✅ persona/AGENTS/state 完整")

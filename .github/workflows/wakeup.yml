@@ -1,19 +1,27 @@
 name: 唤醒 · Wake
 
-# 赛博生命的"生物钟"。时间均为北京时间（cron 用 UTC，北京=UTC+8）：
-#   工作日 06:55 早自习前        -> 55 22 * * 0-4 (UTC)
-#   工作日 12:40 午休            -> 40 4  * * 1-5
-#   工作日 22:05 晚自习回家后    -> 5  14 * * 1-5
-#   周末   10:00 / 20:30         -> 0 2 * * 6,7 / 30 12 * * 6,7
-# GitHub cron 本身有几分钟到几十分钟的随机延迟，天然形成"人味抖动"。
+# 赛博生命的"生物钟"。时间均为北京时间（cron 用 UTC，北京=UTC+8）。
+# 全部槽位每天都会触发，由"作息门卫"（tools/schedule_gate.py）判定今天该开哪组：
+#   上学日（周一~周五，且非法定节假日/寒暑假）：
+#     06:55 早自习前        -> 55 22 * * * (UTC 前一天)
+#     12:40 午休            -> 40 4  * * *
+#     22:05 晚自习回家后    -> 5  14 * * *
+#   自由日（周末 / 法定节假日 / 寒暑假）：
+#     09:30 / 13:30 / 16:30 / 20:30
+#                           -> 30 1 / 30 5 / 30 8 / 30 12 * * *
+#   调休补班的周末会被 API 识别为上学日；手动唤醒（workflow_dispatch）不受门卫限制。
+# GitHub cron 本身有几分钟到几十分钟的随机延迟，天然形成"人味抖动"；门卫容差 ±100 分钟。
+# 改作息：config/life.json 的 wake_slots 与这里的 cron 要同步改。
 
 on:
   schedule:
-    - cron: "55 22 * * 0-4"
-    - cron: "40 4 * * 1-5"
-    - cron: "5 14 * * 1-5"
-    - cron: "0 2 * * 6,7"
-    - cron: "30 12 * * 6,7"
+    - cron: "55 22 * * *"
+    - cron: "40 4 * * *"
+    - cron: "5 14 * * *"
+    - cron: "30 1 * * *"
+    - cron: "30 5 * * *"
+    - cron: "30 8 * * *"
+    - cron: "30 12 * * *"
   workflow_dispatch:
     inputs:
       trigger_note:
@@ -30,6 +38,7 @@ concurrency:
 permissions:
   contents: write   # 提交记忆回仓库
   issues: write     # 唤醒异常时自动开 issue 告警
+  actions: write    # 作息门卫可取消"不该醒"的运行
 
 env:
   TZ: Asia/Shanghai
@@ -47,6 +56,28 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: true
+
+      - name: 作息门卫（现在该醒吗？）
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          GATE="$(python3 tools/schedule_gate.py --event "${{ github.event_name }}")"
+          GATE_RC=$?
+          echo "$GATE"
+          if [ "$GATE_RC" != "0" ]; then
+            echo "::warning::作息门卫脚本异常（rc=$GATE_RC），按原逻辑放行唤醒"
+            exit 0
+          fi
+          OPEN="$(printf '%s' "$GATE" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("open"))' 2>/dev/null)"
+          if [ "$OPEN" = "False" ]; then
+            echo "::notice::作息门卫：现在不该醒（详见上方 JSON），本次运行取消，不算失败"
+            if ! gh run cancel "${{ github.run_id }}"; then
+              echo "::error::作息门卫判定不该醒，但取消运行失败——直接终止本次唤醒"
+              exit 1
+            fi
+            sleep 30
+          fi
 
       - name: 安装 Python 3.14 与依赖
         uses: actions/setup-python@v5
@@ -139,7 +170,7 @@ jobs:
 
       - name: 提交记忆回仓库
         run: |
-          git config user.name "谢古诗"
+          git config user.name "落星如雨"
           git config user.email "xiegushi2022@outlook.com"
           git add memory/ persona/ 2>/dev/null || true
           if git diff --cached --quiet; then

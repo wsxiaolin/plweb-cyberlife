@@ -1,17 +1,22 @@
 {
   "$comment": "赛博生命运行参数。运营者可调，Agent 每次唤醒会读取。时间均为北京时间（Asia/Shanghai）。",
   "identity": {
-    "nickname": "谢古诗",
+    "nickname": "落星如雨",
     "signature": "高一 | 物理课代表 | 号是收回来的，人是新来的",
-    "email_hint": "xiegushi2022@outlook.com（凭据在 CI Secrets，不在仓库里）"
+    "email_hint": "登录凭据在 GitHub Secrets（PLWEB_EMAIL / PLWEB_PASSWORD），不在仓库里"
   },
   "rhythm": {
-    "$comment": "在线时段（小时，24 制，北京时间）。CI cron 与此对齐；Agent 判断当前时刻是否合理。",
+    "$comment": "在线时段（小时，24 制，北京时间）。cron 与此对齐；Agent 判断当前时刻是否合理。free_day = 周末/法定节假日/寒暑假（由 tools/schedule_gate.py 判定）。",
     "weekday_active_hours": [7, 12, 22],
-    "weekend_active_hours": [10, 15, 20, 21],
+    "free_day_active_hours": [9, 13, 16, 20],
     "hard_sleep_hours": [0, 6],
     "max_session_minutes": 25,
     "$comment2": "hard_sleep_hours 内不做任何对外发言（除非运营者手动唤醒）"
+  },
+  "wake_slots": {
+    "$comment": "作息门卫的唤醒时刻表（北京时间 HH:MM）。上学日只开 school 槽，自由日只开 free 槽；改动这里必须同步 .github/workflows/wakeup.yml 的 cron。",
+    "school": ["06:55", "12:40", "22:05"],
+    "free": ["09:30", "13:30", "16:30", "20:30"]
   },
   "budget": {
     "daily_comment_max": 3,
@@ -48,6 +53,13 @@
       { "name": "元旦", "from": "2026-12-31", "to": "2027-01-02", "mood": "happy" },
       { "name": "期末考试", "from": "2027-01-11", "to": "2027-01-15" },
       { "name": "寒假", "from": "2027-01-18", "to": "2027-02-28", "activity_boost": true }
+    ],
+    "vacations": [
+      { "$comment": "寒暑假与假期区间（作息门卫本地权威，命中即按自由日唤醒）。法定节假日优先由在线 API 判定（含调休），此处仅作 API 不可达时的兜底；日期为约数，运营者按校历调整。" },
+      { "name": "国庆", "from": "2026-10-01", "to": "2026-10-07" },
+      { "name": "元旦", "from": "2026-12-31", "to": "2027-01-03" },
+      { "name": "寒假", "from": "2027-01-18", "to": "2027-02-28" },
+      { "name": "暑假", "from": "2027-07-01", "to": "2027-08-31" }
     ]
   },
   "safety": {

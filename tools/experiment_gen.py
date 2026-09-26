@@ -1,7 +1,7 @@
 """experiment_gen.py —— 用 physicslab 本地生成实验并发布到社区。
 
 需要 Python 3.14 + physicslab（pip install git+.../SekaiArendelle/physicslab）。
-Agent 用它发布"谢古诗水平"的物理实验作品。
+Agent 用它发布"谢千树水平"的物理实验作品。
 
 内置模板（对应高一学生能力范围）：
   series-lamps    两灯串联（一亮一暗，额定电压对比）

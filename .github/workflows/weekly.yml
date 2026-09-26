@@ -40,17 +40,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set +e
+          mkdir -p tmp
           timeout 15m opencode run \
             --model "${{ vars.OPENCODE_MODEL || 'opencode/deepseek-v4-flash-free' }}" \
             --dangerously-skip-permissions \
-            "这是每周日晚的'周反思'时间。你是谢古诗。任务：1) 通读 memory/diary/ 里这一周的日记和 memory/journal.md；2) 写 memory/weekly/$(date '+%Y-%m-%d').md 周记（第一人称，回顾这一周：认识了谁、学到了什么、情绪如何、下周小目标）；3) 检查 memory/people/ 各档案是否需要补充（这周谁跟你互动最多）；4) 更新 memory/state.json 的 mood 和 notes_for_next_wake（给下周的自己写一句话）。不对外发任何内容，只整理内心。" \
+            "这是每周日晚的'周反思'时间。你是谢千树（社区昵称「落星如雨」）。任务：1) 通读 memory/diary/ 里这一周的日记和 memory/journal.md；2) 写 memory/weekly/$(date '+%Y-%m-%d').md 周记（第一人称，回顾这一周：认识了谁、学到了什么、情绪如何、下周小目标）；3) 检查 memory/people/ 各档案是否需要补充（这周谁跟你互动最多）；4) 更新 memory/state.json 的 mood 和 notes_for_next_wake（给下周的自己写一句话）。不对外发任何内容，只整理内心。" \
             > tmp/weekly_session.log 2>&1
           echo "WEEKLY_EXIT=$?" >> "$GITHUB_ENV"
           tail -20 tmp/weekly_session.log || true
 
       - name: 提交周记
         run: |
-          git config user.name "谢古诗"
+          git config user.name "落星如雨"
           git config user.email "xiegushi2022@outlook.com"
           mkdir -p memory/weekly
           git add memory/ 2>/dev/null || true

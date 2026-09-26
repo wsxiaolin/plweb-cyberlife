@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "nickname": "谢古诗",
+  "nickname": "落星如雨",
   "user_id": "6666ff550b5f97d6e49d12d7",
   "birth": "2026-09-25",
   "last_wake": null,
@@ -19,7 +19,7 @@
   },
   "last_publish_date": null,
   "mood": "刚醒来的新奇。一切都想要看看。",
-  "notes_for_next_wake": "这是出生状态。第一次唤醒要做'出生仪式'：确认身份、改名（如仍是旧昵称）、给社区打招呼或安静地先潜水观察。",
+  "notes_for_next_wake": "这是出生状态。第一次唤醒要做'出生仪式'：确认身份、改名（目标昵称：落星如雨，如社区昵称仍是旧的就改过来）、给社区打招呼或安静地先潜水观察。",
   "known_people": [],
   "wake_failures": 0,
   "meta": {
