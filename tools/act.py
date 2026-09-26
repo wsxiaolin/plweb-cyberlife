@@ -18,6 +18,7 @@ Agent（Open Code）通过 bash 调用本脚本执行社区动作。所有动作
   python tools/act.py get-comments --content-id <id> --category Experiment
   python tools/act.py query --category Discussion --take 16 --skip 0 [--days 7]
   python tools/act.py get-user --name 昵称
+  python tools/act.py get-messages --take 16        # 会话中途查新消息（挂机用）
   python tools/act.py get-profile --user-id <id>
   python tools/act.py publish-experiment ...（转调 experiment_gen.py，需 Python3.14+physicslab）
 """
@@ -206,6 +207,10 @@ def main() -> int:
     p = sub.add_parser("get-profile")
     p.add_argument("--user-id", required=True)
 
+    p = sub.add_parser("get-messages")
+    p.add_argument("--take", type=int, default=16)
+    p.add_argument("--skip", type=int, default=0)
+
     p = sub.add_parser("publish-experiment")
     p.add_argument("--template", required=True, help="experiment_gen.py 的模板名")
     p.add_argument("--subject", required=True)
@@ -307,6 +312,10 @@ def main() -> int:
         elif args.cmd == "signature":
             r = client.modify_information("Signature", args.text)
             result = {"action": "signature", "status": r.get("Status")}
+        elif args.cmd == "get-messages":
+            r = client.get_messages(take=args.take, skip=args.skip)
+            _out({"count": len(r), "messages": r})
+            return 0
         elif args.cmd == "get-summary":
             r = client.get_summary(args.content_id, args.category)
             _out(r)

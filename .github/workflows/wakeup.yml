@@ -53,7 +53,7 @@ env:
 jobs:
   wake:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: 检出仓库（含全部记忆）
         uses: actions/checkout@v4
@@ -138,7 +138,7 @@ jobs:
           tpl = tpl.replace("{TRIGGER}", sys.argv[1])
           sys.stdout.write(tpl)
           PY
-          timeout 20m opencode run \
+          timeout 40m opencode run \
             --model "${{ env.MODEL }}" \
             --dangerously-skip-permissions \
             "$(cat tmp/wake_prompt.txt)" \
@@ -148,17 +148,17 @@ jobs:
           echo "主模型退出码：${AGENT_EXIT}"
           tail -30 tmp/agent_session.log || true
 
-      - name: 生活 · 自动回退（备用模型 + 简化任务）
+      - name: 生活 · 自动回退（备用模型，同样的完整人生）
         if: env.PREPARE_EXIT == '0' && env.AGENT_EXIT != '0'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "::warning::主模型唤醒失败（exit=${AGENT_EXIT}），启用回退模型 ${OPENCODE_MODEL_FALLBACK}（简化任务：只处理收件箱+写记忆）"
+          echo "::warning::主模型唤醒失败（exit=${AGENT_EXIT}），换备用模型 ${OPENCODE_MODEL_FALLBACK} 继续同一段人生（任务不简化）"
           set +e
-          timeout 15m opencode run \
+          timeout 25m opencode run \
             --model "${OPENCODE_MODEL_FALLBACK}" \
             --dangerously-skip-permissions \
-            "回退唤醒：主模型失败了，你的任务从简——读 tmp/inbox.json，只做两件事：1) 给最重要的1-2条消息写回复并发送（python tools/act.py comment ...）；2) 写今天的日记 memory/diary/$(TZ=Asia/Shanghai date '+%Y-%m-%d').md 并更新 memory/state.json。规则仍按 AGENTS.md。" \
+            "$(cat tmp/wake_prompt.txt)" \
             > tmp/agent_fallback.log 2>&1
           echo "AGENT_EXIT=$?" >> "$GITHUB_ENV"
           set -e
