@@ -26,7 +26,7 @@
       0,
       6
     ],
-    "max_session_minutes": 40,
+    "max_session_minutes": 50,
     "$comment2": "hard_sleep_hours 内不做任何对外发言（除非运营者手动唤醒）。max_session_minutes：一段\"在线\"的总时长——含挂机等消息，不是干完活就走"
   },
   "wake_slots": {
@@ -144,9 +144,18 @@
     "content_selfcheck": "发送前必须自查：这是高一学生会打的话吗？长度？语气？术语范围？"
   },
   "opencode": {
-    "$comment": "Open Code CLI 参数。model 可被 CI 环境变量 OPENCODE_MODEL 覆盖；primary/fallback 用于自动回退。",
-    "primary_model": "opencode/deepseek-v4-flash-free",
-    "fallback_model": "opencode/big-pickle",
-    "timeout_minutes": 40
+    "$comment": "Open Code CLI 参数。model 可被 CI 环境变量 OPENCODE_MODEL 覆盖；primary/fallback 用于自动回退（完整名单与顺序见 wakeup.yml/weekly.yml 的 OPENCODE_MODEL_FALLBACKS）。",
+    "primary_model": "opencode/muse-spark-1.3-contributor-free",
+    "fallback_models": [
+      "opencode/big-pickle",
+      "opencode/deepseek-v4-flash-free",
+      "opencode/mimo-v2.5-free",
+      "opencode/mimo-v2.6-free",
+      "opencode/nemotron-3-ultra-free",
+      "opencode/ling-3.0-flash-fin-free",
+      "opencode/nemotron-3.5-lightning-free",
+      "opencode/muse-spark-1.2-contributor-free"
+    ],
+    "timeout_minutes": 55
   }
 }
