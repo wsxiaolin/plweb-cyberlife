@@ -229,7 +229,14 @@ jobs:
             echo "本次唤醒没有记忆变化（沉默的一天也是一天）"
           else
             git commit -m "记忆 · $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') 醒过一次"
-            git push
+            # 相邻唤醒的 run 可能抢先推进了 main（cron 延迟导致的撞车）。
+            # 记忆绝不能丢：push 被拒就 rebase 远程重试，最多 3 轮。
+            for i in 1 2 3; do
+              if git push; then break; fi
+              echo "::warning::push 被拒（main 已被相邻 run 推进），第 $i 次 rebase 重试"
+              git fetch origin main
+              git rebase origin/main || { echo "::error::rebase 失败，记忆改动在 artifact 与日志中保留"; exit 1; }
+            done
           fi
 
       - name: 异常告警（连续失败开 issue）

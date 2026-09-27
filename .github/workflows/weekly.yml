@@ -1,13 +1,15 @@
 name: 周维护 · Weekly Reflection
 
-# 每周日晚 21:30（北京时间）跑一次"周反思"：
+# 每周日晚 21:37（北京时间）跑一次"周反思"：
 #   - 归并一周记忆（日记不删，但生成 memory/weekly/ 周总结）
 #   - 更新人物档案（合并一周互动）
 #   - 给运营者开一个周报 issue（健康度、活跃统计、风险提示）
+# cron 分钟选 37：GitHub 高峰期整点/半点的 schedule 更容易被延迟或丢弃（实测
+# "30 13 * * 0" 连续两个周日未触发），错开高峰分钟。
 
 on:
   schedule:
-    - cron: "30 13 * * 0"   # UTC 13:30 = 北京 21:30 周日
+    - cron: "37 13 * * 0"   # UTC 13:37 = 北京 21:37 周日
   workflow_dispatch:
 
 permissions:
@@ -84,7 +86,13 @@ jobs:
             echo "本周没有新的总结产出"
           else
             git commit -m "周记 · $(TZ=Asia/Shanghai date '+%Y-%m-%d')"
-            git push
+            # 周日晚上唤醒密集，main 可能被相邻 run 推进——rebase 重试防丢
+            for i in 1 2 3; do
+              if git push; then break; fi
+              echo "::warning::push 被拒，第 $i 次 rebase 重试"
+              git fetch origin main
+              git rebase origin/main || { echo "::error::rebase 失败"; exit 1; }
+            done
           fi
 
       - name: 运营者周报
