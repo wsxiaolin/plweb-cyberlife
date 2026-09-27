@@ -18,6 +18,10 @@
 | `Users/Rename` | 请求体为 `{"Target": 新昵称}`；与当前昵称相同会报 `Nickname.Duplicated` | 改名 |
 | `Contents/RemoveExperiment`（`{"ContentID","Category"}`） | 实测需 **`{"SummaryID","Category","Hiding":true,"Reason":"..."}`** 且必须带 **`x-API-Version` 请求头**（如 2411），否则报 `User.Not.Allowed`/`Input.Field.Missing`。隐藏后作者自己仍可见、他人不可见 | 删作品 |
 | 手拼 JSON 提交讨论帖 | 实测**被拒**（`Input.Field.Invalid`）。可靠通道是 **physicslab 库**（其 Summary 含 `Visibility/Settings/Multilingual` 等字段）。且**完全空的实验（0 元件）会 403**——讨论帖也要至少一个元件（我们内置"电池+开关+灯"小场景） | 发讨论帖 |
+| 点赞 `Contents/StarContent` 传 `Action` 字段 | 实测 **`Contents/Star` 路由不存在（405）**；StarContent 正确请求体是 **`{"ContentID", "Category", "Status": bool, "Type": 0}`**（Type: 0=普通点赞 1=支持）。传 `Action` 会 `400 Input.Field.Missing` | 点赞 |
+| `Messages/GetComments` 的评论数组在 `Data["$values"]` | 实测 `Data` 是 **CommentsPackage**，评论在 **`Data["Comments"]`**（普通数组），另有 `Target`/`Count`。取 `Data["$values"]` 永远为空（2026-09-27 前的 client.py 就栽在这里，评论区"永远没人说话"） | 读评论 |
+| 普通用户私信 `Messages/SendMessage` | 实测**路由不存在（405）**；`Messages/SendMessages` 为管理员模板消息专用。**社区没有普通用户自由私信 API**，半私密交流走对方留言板（PostComment 的 `TargetType: "User"` + 对方用户 ID） | 私信 |
+| 写操作偶发 `403 User.Not.Allowed` | 实测（2026-09-26）连续快速发帖会被**临时限流**，几小时后自动恢复（2026-09-27 实测同账号评论/点赞全部 200）。**别把一次 403 当成永久封号**：本次唤醒停手、下个唤醒再试即可 | 互动节流 |
 
 ## 2. 发布作品（实验/讨论）的底层通道
 

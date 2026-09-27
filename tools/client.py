@@ -98,6 +98,17 @@ class PlwebClient:
                         saved = self._relogin()
                         if saved:
                             return self._post(path, body, _relogin=False)
+                if status == 403 and "Not.Allowed" in message:
+                    # 实测（2026-09-26/27）：连续快速发帖会被临时限流，几小时自动恢复。
+                    # 此类错误不重试（再发只会延长限流），直接把提示带给 Agent：
+                    # 本次唤醒停手、下个唤醒再试，勿判定账号永久不可用。
+                    last_err = PlwebError(
+                        f"{path} -> {status} {message}（多为临时限流/禁言：本次唤醒停手，"
+                        f"下个唤醒再试即可，勿判定账号永久不可用）",
+                        code=4,
+                        status=status,
+                    )
+                    break
                 raise PlwebError(f"{path} -> {status} {message}", code=3, status=status)
             except urllib.error.HTTPError as e:
                 last_err = PlwebError(f"{path} HTTP {e.code}", code=3, status=e.code)
@@ -108,7 +119,6 @@ class PlwebClient:
             except PlwebError as e:
                 last_err = e
             if backoff:
-                time.sleep(backoff + random.uniform(0, 1.5))
                 time.sleep(backoff + random.uniform(0, 1.5))
         raise last_err or PlwebError(f"{path} 未知失败", code=3)
 
@@ -266,7 +276,9 @@ class PlwebClient:
 
     def get_comments(self, target_id: str, target_type: str = "Experiment",
                      take: int = 16, skip: int = 0) -> list[dict]:
-        """评论列表。target_type: Experiment / Discussion / User。target_id 用作品的 ID 字段。"""
+        """评论列表。target_type: Experiment / Discussion / User。target_id 用作品的 ID 字段。
+        实测（2026-09-27）：Data 是 CommentsPackage，评论数组在 Data["Comments"]
+        （普通数组，个别情况可能 $values 包装）；直接取 Data["$values"] 永远返回空。"""
         payload = self._post(
             "Messages/GetComments",
             {
@@ -277,7 +289,11 @@ class PlwebClient:
                 "Skip": skip,
             },
         )
-        return ((payload.get("Data") or {}).get("$values")) or []
+        data = payload.get("Data") or {}
+        comments = data.get("Comments")
+        if isinstance(comments, dict):
+            comments = comments.get("$values") or []
+        return comments or []
 
     def get_user(self, name: Optional[str] = None, user_id: Optional[str] = None) -> dict:
         body = {"Name": name} if name else {"ID": user_id}
@@ -360,17 +376,18 @@ class PlwebClient:
         return payload
 
     def star(self, content_id: str, category: str, action: int = 1) -> dict:
-        """点赞。action: 1 点赞 0 取消。优先 Contents/Star，失败回退 Contents/StarContent。"""
-        try:
-            payload = self._post(
-                "Contents/Star",
-                {"ContentID": content_id, "Category": category, "Action": action},
-            )
-        except PlwebError:
-            payload = self._post(
-                "Contents/StarContent",
-                {"ContentID": content_id, "Category": category, "Action": action},
-            )
+        """点赞。action: 1 点赞 0 取消。
+        实测（2026-09-27）：Contents/Star 路由不存在（405）；StarContent 的
+        正确请求体是 Status(bool)+Type(0=普通点赞)，传 Action 字段会 400 Input.Field.Missing。"""
+        payload = self._post(
+            "Contents/StarContent",
+            {
+                "ContentID": content_id,
+                "Category": category,
+                "Status": bool(action),
+                "Type": 0,
+            },
+        )
         if self.log_actions:
             _log_action({"action": "star", "content_id": content_id,
                          "category": category, "on": bool(action)})
@@ -383,13 +400,16 @@ class PlwebClient:
         return payload
 
     def send_message(self, receiver_id: str, content: str) -> dict:
-        payload = self._post(
-            "Messages/SendMessage", {"ReceiverID": receiver_id, "Content": content}
+        """普通用户站内私信（占位：当前社区 API 没有这个通道）。
+        实测（2026-09-27）：Messages/SendMessage 路由不存在（405），
+        Messages/SendMessages 为管理员模板消息专用。想单独找人说话，
+        走对方留言板：post_comment(content_id=对方用户ID, category="User", ...)。"""
+        raise PlwebError(
+            "社区 API 无普通用户私信通道（SendMessage 405；SendMessages 仅管理员）。"
+            '给对方留言请用: python tools/act.py comment --content-id <对方用户ID> '
+            '--category User --text "..."（对方留言板，半私密）',
+            code=4,
         )
-        if self.log_actions:
-            _log_action({"action": "private_message", "receiver_id": receiver_id,
-                         "text": content})
-        return payload
 
     def rename(self, nickname: str) -> dict:
         payload = self._post("Users/Rename", {"Target": nickname})

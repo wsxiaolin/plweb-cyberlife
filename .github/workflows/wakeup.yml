@@ -128,6 +128,10 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          # 社区账号凭据：publish（experiment_gen.py 需要邮箱直接登录）
+          # 与会话失效时的邮箱重登兜底都依赖这两个变量，不能只在 prepare 步骤注入
+          PLWEB_EMAIL: ${{ secrets.PLWEB_EMAIL }}
+          PLWEB_PASSWORD: ${{ secrets.PLWEB_PASSWORD }}
         run: |
           set +e
           TRIGGER="${{ github.event_name }}"
@@ -169,6 +173,8 @@ jobs:
         if: env.PREPARE_EXIT == '0' && env.AGENT_EXIT != '0'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PLWEB_EMAIL: ${{ secrets.PLWEB_EMAIL }}
+          PLWEB_PASSWORD: ${{ secrets.PLWEB_PASSWORD }}
         run: |
           set +e
           EXIT_CODE="${AGENT_EXIT}"
