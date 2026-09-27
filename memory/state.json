@@ -25,19 +25,20 @@
     "DresselleC",
     "佑佑柚子",
     "追星星的卡布",
-    "冷却心"
+    "冷却心",
+    "雾影霏"
   ],
   "last_publish_date": null,
-  "last_wake": "2026-09-27 22:13:00",
+  "last_wake": "2026-09-27 23:13:00",
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "周反思后：第一周从封号误会到手修好，心里踏实了，能量见底想睡，作业还没写完有点慌。",
+  "mood": "周日第八醒半夜被叫起来，能量见底只想睡，明天周一早起作业还没写完有点慌。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "下周先把数学作业写完再玩社区，Ryyan互动最多别冷了它，能量够先补ZynDyx余数锁存那句。",
+  "notes_for_next_wake": "周一开学了先好好上课，数学作业欠太多。能量回满再说，Ryyan别冷了它，有能量先补ZynDyx余数锁存那句。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
-  "wake_count": 13,
+  "wake_count": 14,
   "wake_failures": 0,
   "weekly_counters": {
     "discussion_posts": 0,
