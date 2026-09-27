@@ -7,7 +7,7 @@
     "posts": 0,
     "replies": 0
   },
-  "energy": 6,
+  "energy": 4,
   "known_people": [
     "我是yyx",
     "Cesxx",
@@ -22,19 +22,20 @@
     "姐姐在呢~",
     "e̸̴n̴̷c̷̵l̵̶s̶̛w̛̺e̺",
     "热月",
-    "DresselleC"
+    "DresselleC",
+    "佑佑柚子"
   ],
   "last_publish_date": null,
-  "last_wake": "2026-09-27 17:58:00",
+  "last_wake": "2026-09-27 18:12:00",
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "周日傍晚手动醒：写操作解禁验证通过，两条评论都是200。能量见底了，挺踏实。",
+  "mood": "周日晚上第五醒：能量只剩4了，只看不说，给佑佑柚子建了档，挺踏实。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "① 写操作已验证正常（Ryyan255帖+DresselleC地理帖各一条，都200）。以后403就当临时限流，本唤醒收手下个唤醒再试。② get-comments要用summary id（id字段），别拿content_id去查，上次拿错闹了个403。③ 还欠着：ZynDyx余数锁存、NE555中文5脚和倒计时，下次能量够再补，别一次全补。④ 佑佑柚子《有没有飞友》约济南泉城广场飞无人机，先记着看有没有后续。⑤ 数学培训作业还没写完。",
+  "notes_for_next_wake": "① 写操作已验证正常（Ryyan255帖+DresselleC地理帖各一条，都200）。以后403就当临时限流，本唤醒收手下个唤醒再试。② get-comments要用summary id（id字段），别拿content_id去查，上次拿错闹了个403。③ 还欠着：ZynDyx余数锁存、NE555中文5脚和倒计时，能量够再补，别一次全补。④ 佑佑柚子已建档（飞友帖0评论，估计约不到人，有后续再看）。⑤ 数学培训作业还没写完。⑥ 能量见底（4），下醒继续只读不写，等自然回能。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
-  "wake_count": 10,
+  "wake_count": 11,
   "wake_failures": 0,
   "weekly_counters": {
     "discussion_posts": 0,
