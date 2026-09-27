@@ -19,6 +19,7 @@ Agent（Open Code）通过 bash 调用本脚本执行社区动作。所有动作
   python tools/act.py query --category Discussion --take 16 --skip 0 [--days 7]
   python tools/act.py get-user --name 昵称
   python tools/act.py get-messages --take 16        # 会话中途查新消息（挂机用）
+  python tools/act.py sign-in                       # 每日签到领金币（幂等，已签自动跳过）
   python tools/act.py get-profile --user-id <id>
   python tools/act.py publish-experiment ...（转调 experiment_gen.py，需 Python3.14+physicslab）
 """
@@ -64,6 +65,50 @@ DISCUSSION_WORKSPACE_TEMPLATE = {
     "CreationDate": None,
     "Paused": False,
 }
+
+
+def cmd_sign_in(client: PlwebClient) -> dict:
+    """每日签到：同步活动 -> 领取所有签到类（Attendance）可领档位。幂等。"""
+    data = client.sync_activities()
+    activities = data.get("Activities") or []
+    stat = data.get("Statistic") or {}
+    records = {r.get("ActivityID"): r for r in (stat.get("Activities") or [])}
+
+    today = time.strftime("%Y-%m-%d")
+    claimed, skipped = [], []
+    for act in activities:
+        if act.get("InterfaceModel") not in ("Attendance", "Upgrade"):
+            continue  # 只处理签到/升级奖励类
+        aid = act.get("ID")
+        rec = records.get(aid) or {}
+        avails = rec.get("Avails") or []
+        gained = rec.get("Gains") or []
+        if not avails:
+            last = (rec.get("LastModified") or "")[:10]
+            skipped.append({"activity": aid,
+                            "reason": "已签" if last == today else "无可领档位"})
+            continue
+        for idx in avails:
+            if idx in gained:
+                continue
+            r = client.receive_bonus(aid, idx, stat)
+            status = r.get("Status")
+            claimed.append({"activity": aid, "index": idx, "status": status,
+                            "message": r.get("Message")})
+            if status == 200:
+                new_stat = (r.get("Data") or {}).get("Statistic")
+                if new_stat:
+                    stat = new_stat
+
+    user = (data.get("User") or {})
+    return {
+        "action": "sign-in",
+        "date": today,
+        "gold": user.get("Gold"),
+        "claimed": claimed,
+        "skipped": skipped,
+        "note": "签到与领奖不耗能量、不占每日预算（就像顺手点一下签到按钮）",
+    }
 
 
 def cmd_post_discussion(client: PlwebClient, args: argparse.Namespace) -> dict:
@@ -211,6 +256,8 @@ def main() -> int:
     p.add_argument("--take", type=int, default=16)
     p.add_argument("--skip", type=int, default=0)
 
+    p = sub.add_parser("sign-in")
+
     p = sub.add_parser("publish-experiment")
     p.add_argument("--template", required=True, help="experiment_gen.py 的模板名")
     p.add_argument("--subject", required=True)
@@ -315,6 +362,9 @@ def main() -> int:
         elif args.cmd == "get-messages":
             r = client.get_messages(take=args.take, skip=args.skip)
             _out({"count": len(r), "messages": r})
+            return 0
+        elif args.cmd == "sign-in":
+            _out(cmd_sign_in(client))
             return 0
         elif args.cmd == "get-summary":
             r = client.get_summary(args.content_id, args.category)

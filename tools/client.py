@@ -393,6 +393,21 @@ class PlwebClient:
                          "category": category, "on": bool(action)})
         return payload
 
+    def sync_activities(self) -> dict:
+        """同步活动与统计。返回 Data：Activities（活动列表，InterfaceModel=="Attendance"
+        为签到类）+ Statistic（含 Activities[].Avails/Gains——可领与已领的档位）。"""
+        payload = self._post("Users/SyncActivities", {})
+        return payload.get("Data") or {}
+
+    def receive_bonus(self, activity_id: str, index: int, statistic: dict) -> dict:
+        """领取活动奖励（签到金币）。statistic 必须原样回传 sync_activities 返回的
+        Statistic（服务端按客户端统计合并签到记录）。已领过返回 403 Activity.Bonus.Received。"""
+        payload = self._post(
+            "Users/ReceiveBonus",
+            {"ActivityID": activity_id, "Index": index, "Statistic": statistic},
+        )
+        return payload
+
     def follow(self, target_id: str, action: bool = True) -> dict:
         payload = self._post("Users/Follow", {"TargetID": target_id, "Action": action})
         if self.log_actions:

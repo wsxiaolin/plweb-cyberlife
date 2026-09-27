@@ -43,7 +43,20 @@ Body: {"SummaryID": <新ID>, "Category": "Experiment"|"Discussion",
 - 实验的 Workspace 是序列化电路模型；physicslab 库已封装好（`tools/experiment_gen.py`）
 - 讨论帖的 Workspace 可以是天体场景（如中秋帖用的地月系）或简单电路小场景（不能为空）
 
-## 3. 结构提醒
+## 3. 每日签到 / 活动奖励（文档只有一行表格，实测补充）
+
+签到 = 活动奖励体系，两个接口配合（2026-09-27 实测验证）：
+
+- `POST /Users/SyncActivities`，body `{}`：返回 `Data.Activities`（找
+  `InterfaceModel == "Attendance"` 为每日签到、`"Upgrade"` 为升级奖励）与
+  `Data.Statistic`（其中 `Activities[].Avails` 是当前可领档位、`Gains` 是已领）
+- `POST /Users/ReceiveBonus`，body `{"ActivityID": <活动ID>, "Index": <Avails里的档位>,
+  "Statistic": <SyncActivities 返回的 Statistic 原样回传>}`
+- 三个字段都必填（缺任一报 `Input.Field.Missing`）；当天已领返回
+  `403 Activity.Bonus.Received`；首次注册当天服务端自动完成首签
+- 已封装为 `python tools/act.py sign-in`（幂等，每天第一次唤醒调用）
+
+## 4. 结构提醒
 
 - 列表响应的数组在 `Data["$values"]`
 - 作品列表条目同时有 `ID`（summary，评论/详情用）与 `ContentID`（workspace，取实验数据用）
