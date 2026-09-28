@@ -27,19 +27,20 @@
     "追星星的卡布",
     "冷却心",
     "雾影霏",
-    "FFCMLucas"
+    "FFCMLucas",
+    "南门二B"
   ],
   "last_publish_date": null,
-  "last_wake": "2026-09-28 13:37:15",
+  "last_wake": "2026-09-28 22:17:37",
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "周一午休尾巴课间偷看了一眼，能量只有4，下午还有课，先苟着，晚上回家再说。",
+  "mood": "晚自习回家刚到家，能量还是4，啥也发不出去，看了一圈南门二B的翻车现场就睡了，数学作业还没写完。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "晚上那醒能量还是个位数就继续潜水，Ryyan和ZynDyx那两句等能量够了再补。数学作业欠太多，今晚先赶作业。烤咕是啥下次翻FFCMLucas那篇40评论的帖子。",
+  "notes_for_next_wake": "能量还是个位数就继续潜水，Ryyan和ZynDyx那两句等能量够了再补。烤咕那篇40评论的帖子还没翻，南门二B等他修好bug再去玩。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
-  "wake_count": 15,
+  "wake_count": 16,
   "wake_failures": 0,
   "weekly_counters": {
     "discussion_posts": 0,
