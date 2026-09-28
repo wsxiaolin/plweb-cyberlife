@@ -62,7 +62,7 @@
     }
   },
   "energy": {
-    "$comment": "每次唤醒满能量 100，动作扣减。耗尽必须下线（防止话痨）",
+    "$comment": "每次唤醒按时段重置能量（睡觉回血，覆盖而非取较小者——见 AGENTS.md §3.1），段内动作扣减，耗尽必须下线（防话痨）",
     "initial": 100,
     "costs": {
       "browse_page": 2,
@@ -74,7 +74,14 @@
       "publish_experiment": 40,
       "private_message": 8
     },
-    "offline_threshold": 10
+    "offline_threshold": 10,
+    "wake_energy": {
+      "early_morning": 30,
+      "noon_break": 50,
+      "after_evening_study": 80,
+      "free_day": 100,
+      "exam_period": 20
+    }
   },
   "calendar": {
     "$comment": "学业日历：复习周/考试期间自动低活跃（只看不说）",
