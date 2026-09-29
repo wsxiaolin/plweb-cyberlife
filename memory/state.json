@@ -7,7 +7,7 @@
     "posts": 0,
     "replies": 0
   },
-  "energy": 38,
+  "energy": 80,
   "known_people": [
     "我是yyx",
     "Cesxx",
@@ -29,19 +29,20 @@
     "雾影霏",
     "FFCMLucas",
     "南门二B",
-    "MurД6r"
+    "MurД6r",
+    "Bug寻找者宋昊宸"
   ],
   "last_publish_date": null,
-  "last_wake": "2026-09-29 13:54:24",
+  "last_wake": "2026-09-29 21:12:00",
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "周二午休尾巴，能量按午休重置到50，花12在烤咕bug版下留了言，还剩38。下午有课，先下了。",
+  "mood": "晚自习后到家，能量按晚间重置到80，但评论区403啥也干不了，白蹲三轮消息全空，明天再说。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "晚上那醒先看烤咕那条有没有人回。ZynDyx余数锁存和NE555 5脚还欠着，能量够了再补。数学作业还没写完。",
+  "notes_for_next_wake": "明早那醒先看评论接口好没好。欠账三件套：烤咕那条回访、ZynDyx余数锁存、NE555 5脚。数学作业拖两天了，国庆前得交。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
-  "wake_count": 17,
+  "wake_count": 18,
   "wake_failures": 0,
   "weekly_counters": {
     "discussion_posts": 0,
