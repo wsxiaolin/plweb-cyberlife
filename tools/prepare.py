@@ -35,6 +35,23 @@ def _dt(ms: int) -> str:
     return time.strftime("%Y-%m-%d %H:%M", time.gmtime(ms / 1000 + 8 * 3600))  # 北京时间
 
 
+def _fmt_message(m: dict) -> dict:
+    """站内信（模板消息）转 Agent 可读的通知条目。
+    CategoryID：2=关注类，3=评论回复类等；Fields.Content 是回复文本，
+    Fields.Discussion/DiscussionID 指向被回复的帖子（可 get-comments 看上下文）。"""
+    fields = m.get("Fields") or {}
+    return {
+        "id": m.get("ID"),
+        "category_id": m.get("CategoryID"),
+        "from": (m.get("UserNames") or [None])[0],
+        "reply_text": fields.get("Content"),
+        "about_discussion": fields.get("Discussion"),
+        "discussion_id": fields.get("DiscussionID"),
+        "comment_id": fields.get("CommentID"),
+        "date": _dt(m.get("Timestamp")),
+    }
+
+
 def _trim(item: dict) -> dict:
     """保留 Agent 决策需要的字段，控制 inbox 体积。"""
     user = item.get("User") or {}
@@ -109,10 +126,10 @@ def main() -> int:
 
     print(f"[prepare] 会话 OK：{client.nickname} ({client.user_id})")
 
-    # ---- 1. 站内信（评论/回复/私信通知） ----
+    # ---- 1. 站内信（评论回复/关注等通知，模板消息系统） ----
     try:
         messages = client.get_messages(take=20)
-        inbox["messages"] = [_trim(m) for m in messages]
+        inbox["messages"] = [_fmt_message(m) for m in messages]
         print(f"[prepare] 站内信 {len(messages)} 条")
     except PlwebError as e:
         inbox["errors"].append(f"消息拉取失败：{e}")

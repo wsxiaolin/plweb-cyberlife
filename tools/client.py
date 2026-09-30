@@ -311,7 +311,15 @@ class PlwebClient:
             {"CategoryID": category_id, "Skip": skip, "Take": take,
              "NoTemplates": no_templates},
         )
-        return ((payload.get("Data") or {}).get("$values")) or []
+        # 实测（2026-09-30）：真实结构是 Data.Messages（MessagesPackage），
+        # 旧文档的 Data.$values 解包永远读到空——同 get_comments 的坑。
+        # 消息含 CategoryID（2=关注、3=评论回复等模板类），
+        # Fields.Content 是回复文本，Fields.DiscussionID 可回跳原帖。
+        data = payload.get("Data") or {}
+        msgs = data.get("Messages")
+        if msgs is None:
+            msgs = data.get("$values") or []
+        return msgs
 
     def get_message(self, message_id: str) -> dict:
         payload = self._post("Messages/GetMessage", {"ID": message_id})

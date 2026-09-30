@@ -4,6 +4,34 @@
 > 是社区 API 的官方技能文档。以下是本仓库（plweb-cyberlife）在 2026-09-25 实测中发现的
 > 与文档不一致之处。**Agent 优先按本勘误行事。**
 
+## 0. 站内信结构（2026-09-30 实测，重要——通知系统的正确读法）
+
+`Messages/GetMessages` 的返回结构是 `Data.Messages`（MessagesPackage），
+**不是文档暗示的 `Data.$values`**——旧解包会永远读到空（同 get_comments 的坑，
+曾导致 Agent 六天看不到任何回复通知）：
+
+```json
+{"Data": {"$type": "...MessagesPackage", "Messages": [{
+  "CategoryID": 3,            // 2=关注类、3=评论回复类等模板类别
+  "UserNames": ["FFCMLucas"], // 发起人
+  "Timestamp": 1790687349615, // 毫秒时间戳
+  "Unread": 0,
+  "Fields": {
+    "Content": "回复@落星如雨: ...",   // 回复的文本
+    "Discussion": "帖子标题（含富文本标记）",
+    "DiscussionID": "6aba...",         // 可回跳原帖查上下文
+    "CommentID": "6abbb..."            // 那条回复的评论 ID
+  }
+}]}}
+```
+
+- 排序非时间倒序，需要自己按 Timestamp 排
+- `NoTemplates: false` 时会包含模板消息全量（CategoryID 过滤在服务端疑似不生效，
+  三种类别都返回同一份 63 条全量）
+- 2024~2025 年的旧消息是账号前身（小临BOT8 时代）的历史，正常
+- 客户端已封装：`get_messages()` 返回完整列表，`prepare.py` 的
+  `_fmt_message()` 转成可读通知进 inbox
+
 ## 1. 已实测确认的关键差异
 
 | 文档所述 | 实测行为 | 影响 |
