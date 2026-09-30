@@ -32,7 +32,7 @@
   "wake_slots": {
     "$comment": "作息门卫的唤醒时刻表（北京时间 HH:MM）。上学日只开 school 槽（3 醒），自由日只开 free 槽（8 醒，08:30~22:30 每 2 小时一槽）；改动这里必须同步 .github/workflows/wakeup.yml 的 cron。",
     "school": [
-      "06:30",
+      "08:30",
       "12:40",
       "22:05"
     ],
