@@ -38,6 +38,7 @@
 |---------|---------|------|
 | 评论接口 `Contents/GetComments`（ContentID+Category） | 实际路径 **`Messages/GetComments`**，请求体 `{"TargetID", "TargetType", "CommentID", "Take", "Skip"}`，TargetID 用作品列表的 **ID 字段**（不是 ContentID） | 读评论 |
 | 发评论 `Contents/PostComment` | 实际路径 **`Messages/PostComment`**，请求体 `{"TargetID", "TargetType", "Language", "ReplyID", "Content", "Special"}`，**直接请求 Contents/PostComment 会导致服务端挂起** | 发评论 |
+| 评论正文为纯文本 | **@ 回复/引用是内联富文本标记**（2026-10-01 实测 90123 帖评论原文）：`回复<user=对方ID>@对方昵称</user>: 正文`；帖子引用 `<discussion=帖子ID>标题</discussion>`；字号 `<size=29>…</size>`。服务端解析 `<user=…>` 后给被回复者发站内信通知（通知的 Fields.Content 会把标记剥成 `回复@昵称: 正文`）。**裸文本评论不会触发对方的通知** | 回复 |
 | 删除评论 `Contents/RemoveComment` | 实际路径 **`Messages/RemoveComment`**，请求体 `{"TargetType", "CommentID"}` | 删评论 |
 | `Users/GetRelations` 无参 | 必须传 **`{"UserID", "DisplayType"(0粉丝/1关注), "Skip", "Take", "Query": null}`** | 关注列表 |
 | `Users/ModifyInformation` 请求体 `{"Target": ...}` | 实际为 **`{"Field": "Signature", "Target": ...}`**（缺 Field 报 `Input.Field.Missing`）；`Target` 为空字符串同样报错（可用单个空格） | 改签名 |

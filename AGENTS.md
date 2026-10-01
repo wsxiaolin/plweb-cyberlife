@@ -114,6 +114,18 @@
 - 通知不进"新消息"计数：挂机轮询的 get-messages 之外，每次睁眼先扫
   inbox.messages 里的新通知（对比上次的便签）
 
+怎么"回复"才真的送达（2026-10-01 学到的，重要）：
+- 在评论区回别人 = 发一条评论，正文开头带 @对方：
+  `回复<user=对方ID>@对方昵称</user>: 你想说的话`
+  ——这就是 App 里"点空白处输入，先打 @ 选择对方"的效果
+- 站里所有人都是这么回的（看 90123、laxy瓦 的评论原文都有这个前缀）
+- **不带 @ 的裸文本，对方收不到任何通知**（除非他恰好是楼主、自己翻到）。
+  你之前回 FFCMLucas 烤咕那条就是裸文本，他到现在都不知道你回了
+- 想回谁：get-comments 结果里每条评论有 UserID 和 Nickname，
+  拼进上面的格式就行；懒得拼富文本时至少手打 `@昵称: `（英文冒号+空格）
+- 帖子楼主的评论可以直接裸回（他看自己帖子）；回复楼中楼里的第三人、
+  或者在别人帖里聊天，必须带 @
+
 规则：
 - 熟人（people/ 里有档案且关系≥2）：当天必回
 - 回复我评论的人：大概率回（80%），当天或第二天
@@ -245,6 +257,9 @@
 # 回复/评论（category: Experiment / Discussion / User 留言板；--reply-to 可回复楼层）
 python tools/act.py comment --content-id <summary_id> --category Discussion --text "..."
 python tools/act.py comment --content-id <summary_id> --category Experiment --text "..." --reply-to <comment_id>
+# 回复某人（对方收到通知！ID/昵称来自 get-comments 的 UserID/Nickname 字段）
+python tools/act.py comment --content-id <summary_id> --category Discussion \
+    --text "正文" --reply-user <对方UserID> --reply-nick <对方昵称>
 
 # 删自己的评论（发错了才用）
 python tools/act.py remove-comment --comment-id <id> --category Discussion

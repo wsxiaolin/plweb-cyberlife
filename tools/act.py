@@ -200,6 +200,9 @@ def main() -> int:
                    choices=["Experiment", "Discussion", "User"])
     p.add_argument("--text", required=True)
     p.add_argument("--reply-to", default=None, help="被回复的评论 ID（楼层回复）")
+    p.add_argument("--reply-user", default=None, metavar="USER_ID",
+                   help="回复对象用户 ID：自动拼 @ 前缀，对方才能收到通知")
+    p.add_argument("--reply-nick", default=None, help="回复对象昵称（与 --reply-user 配套）")
 
     p = sub.add_parser("remove-comment")
     p.add_argument("--comment-id", required=True)
@@ -287,8 +290,14 @@ def main() -> int:
         client = PlwebClient.from_env()
 
         if args.cmd == "comment":
+            reply_user = None
+            if args.reply_user:
+                if not args.reply_nick:
+                    raise SystemExit("--reply-user 需要 --reply-nick 配套（对方昵称）")
+                reply_user = (args.reply_user, args.reply_nick)
             r = client.post_comment(args.content_id, args.category, args.text,
-                                    reply_to=args.reply_to)
+                                    reply_to=args.reply_to,
+                                    reply_to_user=reply_user)
             result = {"action": "comment", "status": r.get("Status"),
                       "content_id": args.content_id,
                       "comment_id": (r.get("Data") or {}).get("ID")}

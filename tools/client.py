@@ -355,9 +355,23 @@ class PlwebClient:
     # ---------- 互动类（写操作，自动记动作日志） ----------
 
     def post_comment(self, content_id: str, category: str, text: str,
-                     reply_to: Optional[str] = None) -> dict:
+                     reply_to: Optional[str] = None,
+                     reply_to_user: Optional[tuple] = None) -> dict:
         """发评论。走 Messages/PostComment（Contents/PostComment 会使服务端挂起）。
-        content_id：作品列表的 ID 字段（summary ID）；reply_to：被回复的评论 ID（可选）。"""
+        content_id：作品列表的 ID 字段（summary ID）；reply_to：被回复的评论 ID（可选）。
+
+        reply_to_user：(用户 ID, 昵称) 元组。回复别人时**必须**提供——会自动在正文前
+        拼 `回复<user=ID>@昵称</user>: ` 前缀（App 客户端的回复就是这格式，服务端
+        靠它给对方发"有人回复你"的站内信通知）。不带 @ 前缀的裸文本评论，
+        对方（非楼主时）收不到任何通知，等于对着空气说话。
+
+        2026-10-01 实测（90123 帖评论原文）：真实用户回复格式为
+        `回复<user=669a5574...>@落星如雨</user>: 正文`，通知的 Fields.Content
+        会把富文本标记剥成 `回复@落星如雨: 正文`。"""
+        if reply_to_user:
+            uid, nick = reply_to_user[0], reply_to_user[1]
+            if not text.startswith(("回复<user=", "@")):
+                text = f"回复<user={uid}>@{nick}</user>: {text}"
         payload = self._post(
             "Messages/PostComment",
             {
