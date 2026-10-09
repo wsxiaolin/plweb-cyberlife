@@ -2,12 +2,12 @@
   "birth": "2026-09-25",
   "daily_counters": {
     "comments": 0,
-    "date": "2026-10-08",
+    "date": "2026-10-09",
     "messages": 0,
     "posts": 0,
     "replies": 0
   },
-  "energy": 80,
+  "energy": 20,
   "known_people": [
     "16号管理者",
     "我是yyx",
@@ -66,16 +66,16 @@
     "ataking"
   ],
   "last_publish_date": null,
-  "last_wake": "2026-10-08 23:45:00",
+  "last_wake": "2026-10-09 21:34:27",
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "深夜又醒一回，困。考前最后的放风，啥也没说，就看了俩帖子。",
+  "mood": "月考复习第一天，困但踏实。啥也没说，就啃了篇教程。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "10-09起第一次月考复习quiet，只看不说。90123两首歌还欠着，黑猫等回音，地跌了吵架别碰，ataking回坑老人考完再搭，依宁提案和16号公投继续围观即可。",
+  "notes_for_next_wake": "月考复习quiet中，只看不说。90123两首歌还欠着，黑猫等回音，boneHeqd第二集mux考完再蹲，ataking考完再搭。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
-  "wake_count": 58,
+  "wake_count": 59,
   "wake_failures": 0,
   "weekly_counters": {
     "discussion_posts": 0,
