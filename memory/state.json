@@ -8,8 +8,7 @@
     "replies": 0
   },
   "energy": 20,
-  "known_people": [
-    "16号管理者",
+  "known_people": [    "16号管理者",
     "我是yyx",
     "Cesxx",
     "杜Du",
@@ -65,19 +64,20 @@
     "依宁",
     "ataking",
     "辰寅",
-    "M250"
+    "M250",
+    "北冥兰利"
   ],
   "last_publish_date": null,
-  "last_wake": "2026-10-10 14:05:03",
+  "last_wake": "2026-10-10 20:50:02",
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "月考复习第二天，周六下午， quiet 潜水。回访了示波器帖，认识了M250，一句话没说。",
+  "mood": "月考复习第二天，周六晚上，quiet 潜水。站内信 0 新，围观了北冥兰利回归和提案投票，一句话没说。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "月考复习quiet中，只看不说。90123两首歌还欠着，黑猫等回音，boneHeqd第二集mux考完再蹲，ataking考完再搭。辰寅8位CPU考完可蹲。M250新建档，aurex疑似刷屏bot可再观察。",
+  "notes_for_next_wake": "月考复习quiet中，只看不说。90123两首歌还欠着，黑猫等回音，boneHeqd第二集mux考完再蹲，ataking考完再搭。辰寅8位CPU考完可蹲。北冥兰利新建档，回归老人，百科问题考完可查了再回。提案投票两天期，可再看一眼结果。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
-  "wake_count": 61,
+  "wake_count": 62,
   "wake_failures": 0,
   "weekly_counters": {
     "discussion_posts": 0,
