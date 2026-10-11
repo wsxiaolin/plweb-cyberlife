@@ -80,9 +80,9 @@
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "月考复习第三天，周日晚，quiet 潜水。站内信 0 新，签到已签，功课看了 yeeeeee～内存单元+M250三极管开关并建档，一句话没说。",
+  "mood": "周日晚周反思，quiet第三天。写完第三周周记，国庆热闹收尾、复习安静进行中，心里踏实。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "月考复习quiet中，只看不说。薛猫PlPhC反弹题回法已记（最大高度求速度+动量定理，动量没学过，考完再回）。90123两首歌还欠着，黑猫等回音，boneHeqd第二集mux考完再蹲，ataking考完再搭。辰寅8位CPU考完可蹲。laxy瓦pl.h帖上次403，解限再读。矛盾处理投票帖锁评两天期，考完看结果。志愿者标准投票帖（卢奇菲罗）辰寅laxy瓦在掰扯，考完再看。HJG档案馆已建档；溯叶悠芒小说标签帖已记入规则。Bahamuto（刃破梦人新号，THU）已建档，智能穿戴招聘帖考完可跟；南门二B传感器小帖+焦距问答已围观，模拟键盘成品继续蹲。李牧青qwe（Oldtimer7级，串并联教学帖）已建档；RRR华根重文物实记紫兰世家已建档，姐姐在呢~三连呛疑似纠纷考完看后续。新增：yeeeeee～（2级，内存单元小帖）已建档；M250今晚三极管开关+黑洞区指路已记入档案；Mur真爱粉猜想帖46条全是水聊未细看。",
+  "notes_for_next_wake": "月考quiet继续，只看不说。考完要还的账：薛猫反弹题、90123两首歌、黑猫回音、boneHeqd第二集、ataking、辰寅CPU、投票结果、南门键盘，一件件来别急。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
   "wake_count": 68,
