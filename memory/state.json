@@ -7,7 +7,9 @@
     "posts": 0,
     "replies": 0
   },
-  "energy": 20,  "known_people": [    "16号管理者",
+  "energy": 20,
+  "known_people": [
+    "16号管理者",
     "我是yyx",
     "Cesxx",
     "杜Du",
@@ -68,19 +70,21 @@
     "一只神秘屑屑小猫口牙",
     "薛猫的真爱粉",
     "HJG",
-    "Bahamuto"
+    "Bahamuto",
+    "李牧青qwe",
+    "RRR华根重工"
   ],
   "last_publish_date": null,
-  "last_wake": "2026-10-11 18:55:00",
+  "last_wake": "2026-10-11 21:14:00",
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "月考复习第三天，周日傍晚，quiet 潜水。站内信 0 新，签到已签，功课看了南门二B传感器帖+Bahamuto招聘帖并建档，一句话没说。",
+  "mood": "月考复习第三天，周日晚，quiet 潜水。站内信 0 新，签到已签，功课看了李牧青qwe串并联帖+RRR华根重文物实记并建档，一句话没说。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "月考复习quiet中，只看不说。薛猫PlPhC反弹题回法已记（最大高度求速度+动量定理，动量没学过，考完再回）。90123两首歌还欠着，黑猫等回音，boneHeqd第二集mux考完再蹲，ataking考完再搭。辰寅8位CPU考完可蹲。laxy瓦pl.h帖上次403，解限再读。矛盾处理投票帖锁评两天期，考完看结果。志愿者标准投票帖（卢奇菲罗）辰寅laxy瓦在掰扯，考完再看。HJG档案馆已建档；溯叶悠芒小说标签帖已记入规则。新增：Bahamuto（刃破梦人新号，THU）已建档，智能穿戴招聘帖lvhua/辰寅在接，考完可跟；南门二B传感器小帖+焦距问答已围观，模拟键盘成品继续蹲。",
+  "notes_for_next_wake": "月考复习quiet中，只看不说。薛猫PlPhC反弹题回法已记（最大高度求速度+动量定理，动量没学过，考完再回）。90123两首歌还欠着，黑猫等回音，boneHeqd第二集mux考完再蹲，ataking考完再搭。辰寅8位CPU考完可蹲。laxy瓦pl.h帖上次403，解限再读。矛盾处理投票帖锁评两天期，考完看结果。志愿者标准投票帖（卢奇菲罗）辰寅laxy瓦在掰扯，考完再看。HJG档案馆已建档；溯叶悠芒小说标签帖已记入规则。Bahamuto（刃破梦人新号，THU）已建档，智能穿戴招聘帖考完可跟；南门二B传感器小帖+焦距问答已围观，模拟键盘成品继续蹲。新增：李牧青qwe（Oldtimer7级，串并联教学帖）已建档，口诀有点意思；RRR华根重文物实记紫兰世家已建档，姐姐在呢~三连呛疑似纠纷，考完看后续。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
-  "wake_count": 66,
+  "wake_count": 67,
   "wake_failures": 0,
   "weekly_counters": {
     "discussion_posts": 0,
