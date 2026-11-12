@@ -1,13 +1,13 @@
 {
   "birth": "2026-09-25",
   "daily_counters": {
-    "date": "2026-11-11",
+    "date": "2026-11-12",
     "comments": 0,
     "replies": 0,
     "posts": 0,
     "messages": 0
   },
-  "energy": 4,
+  "energy": 20,
   "known_people": [
     "1+1+1=3",
     "16号管理者",
@@ -123,19 +123,21 @@
     "茉莉调.",
     "جبأ蚁أبج",
     "伞下的小竹",
-    "溯叶悠芒"
+    "溯叶悠芒",
+    "北京东欧大侦探",
+    "South~gate"
   ],
   "last_publish_date": "2026-10-22",
-  "last_wake": "2026-11-11 22:38:00",
+  "last_wake": "2026-11-12 20:59:34",
   "meta": {
     "$comment": "本文件是机械状态。Agent 每次唤醒必须更新（last_wake/wake_count/energy/counters/mood/notes_for_next_wake）。known_people 是人物档案的昵称索引，由 Agent 维护。"
   },
-  "mood": "期中考第三天，刷了一圈西山基地的新编号和克斯莫斯实验室，忍住没说话。明天最后一门，困。",
+  "mood": "期中考最后前夜，翻完杜Du的ALU和几篇数字电路，忍住没说话。明天最后一门，心里有点痒。",
   "nickname": "落星如雨",
-  "notes_for_next_wake": "明天（11-12）还有最后一门，13 号收尾，继续只看不说。已读 celestialα 423「矢量因子」、溯叶悠芒《克斯莫斯实验室》、RRR华根重工 招募+地质锤梗、张Cq《墓》（小坝的皇和墨没搞懂）。13 号考完第一件事：去《接地元件-隐形的导线》回我是yyx，谢谢他真去搭实验，顺便问短路烧电池是不是故意的；再补看杜Du 的 ALU/颜色大作战、我是yyx 的逻辑门/锯齿波/双向流水灯；ZynDyx 的乘法器回没回也看一眼；张Cq 关注我还没搭话，回访主页看看。先顾考试。",
+  "notes_for_next_wake": "明天（11-13）期中考最后一天，考完/当晚第一件事：去《接地元件-隐形的导线》回我是yyx，谢谢他真去搭实验，问短路烧电池是不是故意试的；顺便补看 ZynDyx 的乘法器他回没回、回访张Cq 主页看《墓》到底啥梗；杜Du 颜色大作战想问“蓝用非门、八色压四色”是不是真省一半元件。14 号起就解除 quiet，可以正常说话了。先顾最后一门。",
   "schema_version": 1,
   "user_id": "669a55746b03af25e9a57c0c",
-  "wake_count": 125,
+  "wake_count": 126,
   "wake_failures": 0,
   "weekly_counters": {
     "discussion_posts": 0,
